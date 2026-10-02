@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sasnaka Sansada - Learn Steer 2.0</title>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg: #ffffff;
+      --text: #0b1f3a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --accent: #00a8e8;
+      --accent-light: #e0f2fe;
+      --accent-dark: #0284c7;
+      --card-bg: #ffffff;
+      --grid-color: rgba(0, 168, 232, 0.06);
+      --marquee-bg: #f8fafc;
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #090d16;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: #1e293b;
+      --accent: #38bdf8;
+      --accent-light: #0c4a6e;
+      --accent-dark: #7dd3fc;
+      --card-bg: #0f172a;
+      --grid-color: rgba(56, 189, 248, 0.07);
+      --marquee-bg: #0f172a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Background Square Grid Pattern */
+    .bg-grid-pattern {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+      background-size: 36px 36px;
+      pointer-events: none;
+      z-index: 0;
+      transition: transform 0.1s ease-out;
+    }
+
+    /* Preloader Screen */
+    #preloader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #090d16;
+      color: #ffffff;
+      pointer-events: auto;
+      transition: opacity 0.5s ease;
+    }
+
+    .preloader-content {
+      text-align: center;
+      z-index: 10;
+    }
+
+    .counter {
+      font-family: var(--font-heading);
+      font-size: clamp(3rem, 8vw, 6rem);
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -2px;
+    }
+
+    .progress-bar-container {
+      width: 200px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.1);
+      margin: 20px auto 0;
+      overflow: hidden;
+      border-radius: 4px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.1s ease-out;
+    }
+
+    /* Curtain Strips Overlay */
+    .curtain-container {
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      display: flex;
+      pointer-events: none;
+    }
+
+    .curtain-strip {
+      flex: 1;
+      height: 100%;
+      background: #00a8e8;
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .curtain-strip:nth-child(even) {
+      background: #38bdf8;
+      transform-origin: bottom;
+    }
+
+    /* Navigation Header */
+    header {
+      position: relative;
+      z-index: 100;
+      padding: 2rem 5%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .brand-logo {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .time-clock {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-family: monospace;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 10px;
+    }
+
+    .btn-action {
+      background: transparent;
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-action:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent-dark);
+    }
+
+    .btn-theme-toggle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .btn-theme-toggle:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Sleek Marquee Ticker */
+    .marquee-wrapper {
+      position: relative;
+      z-index: 10;
+      background: var(--marquee-bg);
+      border-y: 1px solid var(--border);
+      padding: 8px 0;
+      overflow: hidden;
+      display: flex;
+      white-space: nowrap;
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 30px;
+      animation: marquee 25s linear infinite;
+    }
+
+    .marquee-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .marquee-item i {
+      color: var(--accent);
+      font-size: 0.6rem;
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Main Container */
+    main {
+      position: relative;
+      z-index: 10;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 5%;
+    }
+
+    /* Hero Section with 70% Extra Padding */
+    .hero-section {
+      padding: clamp(14rem, 28vw, 24rem) 0;
+      position: relative;
+    }
+
+    .hero-title-container {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.5rem, 6vw, 4.8rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -1.5px;
+      color: var(--text);
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease 0.3s, transform 0.5s ease 0.3s;
+    }
+
+    .hero-title.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Light Blue Vertical Bar Wipe Animation */
+    .bar-revealer {
+      position: absolute;
+      inset: 0;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      z-index: 5;
+    }
+
+    .bar-revealer.animate {
+      animation: barSweep 0.8s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+    }
+
+    @keyframes barSweep {
+      0% { transform: scaleX(0); transform-origin: left; }
+      50% { transform: scaleX(1); transform-origin: left; }
+      50.1% { transform: scaleX(1); transform-origin: right; }
+      100% { transform: scaleX(0); transform-origin: right; }
+    }
+
+    /* Content Section */
+    .content-section {
+      padding: 4rem 0 6rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-family: var(--font-heading);
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-label::before {
+      content: '';
+      width: 12px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    .lead-paragraph {
+      font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text);
+      max-width: 900px;
+      margin-bottom: 3.5rem;
+    }
+
+    .sub-lead {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      max-width: 800px;
+    }
+
+    /* Bullets Grid */
+    .bullets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 2rem;
+    }
+
+    .bullet-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      position: relative;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .bullet-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 30px rgba(0, 168, 232, 0.08);
+    }
+
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.2rem;
+      font-size: 1.1rem;
+    }
+
+    .card-text {
+      font-size: 0.98rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* Roadmap Section */
+    .roadmap-section {
+      padding: 6rem 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .timeline-container {
+      position: relative;
+      margin-top: 3rem;
+      padding-left: 30px;
+    }
+
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 10px;
+      bottom: 10px;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 2.5rem;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -30px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 3px solid var(--accent);
+      transition: all 0.3s ease;
+    }
+
+    .timeline-item:hover .timeline-dot {
+      background: var(--accent);
+      transform: scale(1.2);
+    }
+
+    .timeline-phase {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+    }
+
+    .timeline-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.4rem;
+    }
+
+    .timeline-desc {
+      font-size: 0.92rem;
+      color: var(--muted);
+      max-width: 650px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 5%;
+      position: relative;
+      z-index: 10;
+      background: var(--bg);
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+      .time-clock { display: none; }
+      .timeline-container { padding-left: 20px; }
+      .timeline-dot { left: -20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Square Grid Background -->
+  <div class="bg-grid-pattern" id="gridPattern"></div>
+
+  <!-- Preloader Screen -->
+  <div id="preloader">
+    <div class="preloader-content">
+      <div class="counter" id="counter">0%</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6 Vertical Curtain Strips -->
+  <div class="curtain-container" id="curtainContainer">
+    <div class="curtain-strip"></div>
+    <div class="curtain-strip"></div>
+    <div class="curtain-strip"></div>
+    <div class="curtain-strip"></div>
+    <div class="curtain-strip"></div>
+    <div class="curtain-strip"></div>
+  </div>
+
+  <!-- Header Navigation -->
+  <header>
+    <a href="#" class="brand-logo">
+      SASNAKA SANSADA <span class="brand-badge">2.0</span>
+    </a>
+    <div class="nav-actions">
+      <div class="time-clock">
+        <i class="fa-regular fa-clock"></i>
+        <span>SL TIME: <strong id="slClock">--:--:--</strong></span>
+      </div>
+      <button class="btn-theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle Theme">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
+      <button class="btn-action" onclick="triggerIntroAnimation()">
+        <i class="fa-solid fa-rotate-right"></i> Replay Intro
+      </button>
+    </div>
+  </header>
+
+  <!-- Marquee Ticker -->
+  <div class="marquee-wrapper">
+    <div class="marquee-track">
+      <div class="marquee-item">Sasnaka Sansada <i class="fa-solid fa-circle"></i></div>
+      <div class="marquee-item">Learn Steer 2.0 <i class="fa-solid fa-circle"></i></div>
+      <div class="marquee-item">Digital Transformation <i class="fa-solid fa-circle"></i></div>
+      <div class="marquee-item">Education Innovation <i class="fa-solid fa-circle"></i></div>
+      <div class="marquee-item">Nationwide Impact <i class="fa-solid fa-circle"></i></div>
+      <!-- Duplicate for infinite loop -->
+      <div class="marquee-item">Sasnaka Sansada <i class="fa-solid fa-circle"></i></div>
+      <div class="marquee-item">Learn Steer 2.0 <i class="fa-solid fa-circle"></i></div>
+      <div class="marquee-item">Digital Transformation <i class="fa-solid fa-circle"></i></div>
+      <div class="marquee-item">Education Innovation <i class="fa-solid fa-circle"></i></div>
+      <div class="marquee-item">Nationwide Impact <i class="fa-solid fa-circle"></i></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Hero Title Section (+70% Vertical Padding) -->
+    <section class="hero-section">
+      <div class="hero-title-container">
+        <div class="bar-revealer" id="barRevealer"></div>
+        <h1 class="hero-title" id="heroTitle">Sasnaka Sansada - Learn Steer 2.0</h1>
+      </div>
+    </section>
+
+    <!-- Exact Vision & Mission Section -->
+    <section class="content-section">
+      <div class="section-label">The Vision & Mission</div>
+      
+      <p class="lead-paragraph">
+        Sasnaka Sansada is leveling up. As we move into Learn Steer 2.0, we are embarking on a massive Digital Transformation to revolutionize the Sri Lankan education sector. We aren't just building a website; we are architecting a comprehensive educational ecosystem designed to scale impact nationwide.
+      </p>
+
+      <p class="sub-lead">
+        We are looking for passionate Software Developers, Web Developers, and Data Enthusiasts to join our core technical team. This is a unique opportunity to work in an industry-standard environment alongside:
+      </p>
+
+      <div class="bullets-grid">
+        <div class="bullet-card">
+          <div class="card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="card-text">
+            Undergraduates from leading State and Private universities.
+          </div>
+        </div>
+
+        <div class="bullet-card">
+          <div class="card-icon"><i class="fa-solid fa-laptop-code"></i></div>
+          <div class="card-text">
+            Trainee & Associate Developers currently working in multinational tech firms.
+          </div>
+        </div>
+
+        <div class="bullet-card">
+          <div class="card-icon"><i class="fa-solid fa-users-gear"></i></div>
+          <div class="card-text">
+            Experts providing mentorship in modern tech stacks and agile methodologies.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Simplified Roadmap Timeline Section -->
+    <section class="roadmap-section">
+      <div class="section-label">Project Roadmap</div>
+      
+      <div class="timeline-container">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-phase">Phase 01 — Q1 2026</div>
+          <div class="timeline-title">Ecosystem Architecture & Core Onboarding</div>
+          <div class="timeline-desc">Establish technical team structure, state university developer groups, and core platform foundations.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-phase">Phase 02 — Q2 2026</div>
+          <div class="timeline-title">Learn Steer Platform Alpha Release</div>
+          <div class="timeline-desc">Deploy primary educational learning modules and real-time student tracking systems.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-phase">Phase 03 — Q3 2026</div>
+          <div class="timeline-title">Nationwide Digital Expansion</div>
+          <div class="timeline-desc">Integrate data analytics pipelines and roll out across provincial Sri Lankan school networks.</div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-phase">Phase 04 — Q4 2026</div>
+          <div class="timeline-title">Ecosystem Optimization & Mentorship Scale</div>
+          <div class="timeline-desc">Full agile iteration, industry partner integration, and continuous mentor feedback loops.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <div>© Sasnaka Sansada. All rights reserved.</div>
+      <div>Learn Steer 2.0 • Digital Transformation Initiative</div>
+    </div>
+  </footer>
+
+  <script>
+    // Dark/Light Theme Switching
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      htmlEl.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById('themeIcon');
+      if (icon) {
+        icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      }
+    }
+
+    // Load saved theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    // Live Sri Lanka Time Clock
+    function updateSLClock() {
+      const options = {
+        timeZone: 'Asia/Colombo',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      };
+      const now = new Date().toLocaleTimeString('en-US', options);
+      const clockEl = document.getElementById('slClock');
+      if (clockEl) clockEl.textContent = now;
+    }
+    setInterval(updateSLClock, 1000);
+    updateSLClock();
+
+    // Intro Curtain & Title Reveal Animation
+    function triggerIntroAnimation() {
+      const preloader = document.getElementById('preloader');
+      const counter = document.getElementById('counter');
+      const progressBar = document.getElementById('progressBar');
+      const strips = document.querySelectorAll('.curtain-strip');
+      const heroTitle = document.getElementById('heroTitle');
+      const barRevealer = document.getElementById('barRevealer');
+
+      // Reset state
+      preloader.style.opacity = '1';
+      preloader.style.pointerEvents = 'auto';
+      counter.textContent = '0%';
+      progressBar.style.width = '0%';
+      heroTitle.classList.remove('revealed');
+      barRevealer.classList.remove('animate');
+      
+      strips.forEach(strip => strip.style.transform = 'scaleY(0)');
+
+      let count = 0;
+      const interval = setInterval(() => {
+        count += Math.floor(Math.random() * 12) + 4;
+        if (count > 100) count = 100;
+
+        counter.textContent = count + '%';
+        progressBar.style.width = count + '%';
+
+        if (count === 100) {
+          clearInterval(interval);
+          setTimeout(() => {
+            preloader.style.opacity = '0';
+            preloader.style.pointerEvents = 'none';
+
+            // Curtain strips wipe animation
+            strips.forEach((strip, index) => {
+              setTimeout(() => {
+                strip.style.transform = 'scaleY(1)';
+                setTimeout(() => {
+                  strip.style.transform = 'scaleY(0)';
+                }, 400);
+              }, index * 80);
+            });
+
+            // Hero title bar sweep
+            setTimeout(() => {
+              barRevealer.classList.add('animate');
+              setTimeout(() => {
+                heroTitle.classList.add('revealed');
+              }, 400);
+            }, 600);
+
+          }, 200);
+        }
+      }, 35);
+    }
+
+    // Scroll Parallax Effect for Grid
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const gridPattern = document.getElementById('gridPattern');
+      if (gridPattern) {
+        gridPattern.style.transform = `translateY(${scrolled * 0.15}px)`;
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', triggerIntroAnimation);
+  </script>
+</body>
+</html>
