@@ -183,26 +183,6 @@
       margin-right: 10px;
     }
 
-    .btn-action {
-      background: transparent;
-      border: 1px solid var(--border);
-      padding: 8px 16px;
-      border-radius: 50px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-action:hover {
-      background: var(--accent-light);
-      border-color: var(--accent);
-      color: var(--accent-dark);
-    }
-
     .btn-theme-toggle {
       width: 38px;
       height: 38px;
@@ -269,7 +249,7 @@
       padding: 0 5%;
     }
 
-    /* Hero Section with 70% Extra Padding */
+    /* Hero Section (+70% Extra Padding) */
     .hero-section {
       padding: clamp(14rem, 28vw, 24rem) 0;
       position: relative;
@@ -540,9 +520,6 @@
       </div>
       <button class="btn-theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle Theme">
         <i class="fa-solid fa-moon" id="themeIcon"></i>
-      </button>
-      <button class="btn-action" onclick="triggerIntroAnimation()">
-        <i class="fa-solid fa-rotate-right"></i> Replay Intro
       </button>
     </div>
   </header>
